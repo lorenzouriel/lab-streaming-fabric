@@ -1,0 +1,114 @@
+schema_version: "1.0"
+domain: javascript-typescript-clean-code
+file_type: code-standards
+last_validated: "2026-03-26"
+source: "TypeScript 5.x handbook, ESLint, Prettier, Node.js docs, TC39 proposals"
+
+runtime:
+  minimum_node: "20"
+  preferred_node: "22"
+  module_system: "esm"
+  target_versions:
+    - "ES2022"
+    - "ES2023"
+
+typescript:
+  minimum_version: "5.0"
+  preferred_version: "5.6"
+  strict_mode: true
+  rules:
+    - "Enable `strict: true` in tsconfig.json -- never disable individual strict flags"
+    - "Enable `noUncheckedIndexedAccess` to catch unsafe array/object indexing"
+    - "Prefer `interface` for object shapes, `type` for unions/tuples/mapped types"
+    - "Use `unknown` instead of `any` for untyped external input, then narrow"
+    - "Use `satisfies` instead of a type annotation when you need the narrowed literal type"
+    - "All exported functions must have explicit return type annotations"
+    - "Avoid non-null assertions (`!`) -- narrow with a guard or default instead"
+
+style:
+  formatter: "prettier"
+  linter: "eslint (typescript-eslint)"
+  line_length: 100
+  indent: 2
+  quote_style: "double"
+  semicolons: true
+  trailing_comma: "all"
+
+naming:
+  files: "kebab-case.ts (PascalCase.tsx for React components)"
+  classes_interfaces_types: "PascalCase"
+  functions_variables: "camelCase"
+  constants: "UPPER_SNAKE_CASE"
+  private_class_fields: "#leadingHash"
+  booleans: "is_/has_/can_/should_ prefix"
+  rules:
+    - "Names must be descriptive and intention-revealing"
+    - "Avoid single-letter names except in short arrow-function callbacks"
+    - "No abbreviations unless universally understood (db, api, url, id)"
+    - "Do not prefix interfaces with `I` (e.g. `IUser`) -- use `User`"
+
+functions:
+  max_lines: 30
+  max_parameters: 4
+  max_nesting_depth: 3
+  rules:
+    - "Single responsibility per function"
+    - "Prefer an options object over 4+ positional parameters"
+    - "Prefer early returns over deep nesting"
+    - "Use `void` explicitly for functions called only for side effects"
+    - "JSDoc required for exported public functions"
+
+error_handling:
+  rules:
+    - "Never use an empty `catch {}` block"
+    - "Always chain errors with `new Error(msg, { cause: original })`"
+    - "Define a custom error hierarchy with a base `AppError`"
+    - "Narrow caught errors with `instanceof` before handling"
+    - "Log at error boundaries, not at every throw site"
+    - "Validate inputs early, fail fast"
+
+imports:
+  order:
+    - "node builtins (node:fs, node:path)"
+    - "external packages"
+    - "internal / relative"
+  rules:
+    - "Never use wildcard `import * as x` unless required by the library"
+    - "Group imports by category with a blank line between groups"
+    - "Use relative imports within a package, path aliases across package boundaries"
+    - "Let eslint-plugin-import / prettier handle import ordering"
+    - "Prefer named exports; reserve default exports for framework entry points (pages, components)"
+
+testing:
+  framework: "vitest"
+  rules:
+    - "Test file naming: `{module}.test.ts` colocated with source, or under `tests/`"
+    - "Test name pattern: `describe(subject) > it(\"does X when Y\")`"
+    - "One logical assertion focus per test when practical"
+    - "Use `beforeEach`/`afterEach` for setup, not shared mutable module state"
+    - "Use `test.each` / `it.each` for parametrized cases"
+    - "Mock at the boundary (network, fs, time), not internal business logic"
+
+project_structure:
+  layout: "src-layout"
+  config_file: "package.json + tsconfig.json"
+  rules:
+    - "Use src/ for source, dist/ for build output (gitignored)"
+    - "Domain layer has zero external dependencies (no fetch, no fs, no DB client imports)"
+    - "Adapters implement interfaces defined in the application layer"
+    - "No circular imports between modules"
+    - "Use a single package manager lockfile (pnpm-lock.yaml, package-lock.json, or yarn.lock) -- never mix"
+
+eslint:
+  config:
+    extends:
+      - "eslint:recommended"
+      - "plugin:@typescript-eslint/recommended-type-checked"
+      - "plugin:@typescript-eslint/stylistic-type-checked"
+    rules:
+      - "@typescript-eslint/no-explicit-any: error"
+      - "@typescript-eslint/no-floating-promises: error"
+      - "@typescript-eslint/no-unused-vars: error"
+      - "@typescript-eslint/consistent-type-imports: error"
+      - "eqeqeq: error"
+      - "no-console: warn"

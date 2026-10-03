@@ -1,0 +1,13 @@
+{
+  "name": "engineer",
+  "displayName": "engineer (master-claude / AgentSpec)",
+  "version": "1.0.0",
+  "description": "Software-engineering config: domain sub-agents, 5-phase spec-driven-development workflow, data-engineering knowledge base, diagramming and code-review skills.",
+  "author": {
+    "name": "Lorenzo Uriel",
+    "email": "lorenzouriel394@gmail.com"
+  },
+  "repository": "https://github.com/lorenzouriel/master-claude",
+  "license": "MIT",
+  "keywords": ["data-engineering", "sdd", "spark", "dbt", "airflow", "agents"]
+}

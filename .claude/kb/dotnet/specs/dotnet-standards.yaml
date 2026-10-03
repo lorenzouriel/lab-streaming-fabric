@@ -1,0 +1,128 @@
+schema_version: "1.0"
+domain: dotnet-clean-code
+file_type: code-standards
+last_validated: "2026-04-14"
+source: "C# Language Reference, .NET Runtime docs, .NET Coding Conventions, Roslyn analyzers"
+
+dotnet:
+  minimum_version: "net8.0"
+  preferred_version: "net9.0"
+  target_versions:
+    - "net8.0"
+    - "net9.0"
+  language_version: "latest"
+
+style:
+  formatter: "dotnet format"
+  linter: "Roslyn analyzers (AnalysisLevel=latest-recommended) + StyleCop.Analyzers"
+  config_file: ".editorconfig"
+  indent: 4
+  brace_style: "Allman (opening brace on its own line)"
+  using_directives: "outside namespace, System.* first"
+  file_scoped_namespaces: true
+
+nullable_reference_types:
+  enforced: true
+  setting: "<Nullable>enable</Nullable> in Directory.Build.props"
+  rules:
+    - "Treat CS8600/CS8602/CS8603/CS8625 as errors in CI"
+    - "Use `ArgumentNullException.ThrowIfNull` for guard clauses, not manual `if (x is null) throw`"
+    - "Avoid the null-forgiving operator (`!`) except with a comment explaining why"
+    - "Annotate TryX out-parameters with [NotNullWhen(true)]"
+    - "Use `required` for properties that must be set at construction (C# 11+)"
+
+records_and_types:
+  preferred_options:
+    positional_records: "for simple immutable DTOs"
+    readonly_record_struct: "for small, frequently-copied value objects"
+  rules:
+    - "Prefer IReadOnlyList<T>/IReadOnlyDictionary<T,V> over mutable collections on records"
+    - "Use `with` expressions for non-destructive updates, never mutate shared instances"
+    - "Use primary constructors (C# 12+) for simple dependency-injected services"
+    - "Use `sealed` on classes not designed for inheritance"
+
+naming:
+  namespaces: "PascalCase, dotted"
+  classes_records_interfaces: "PascalCase"
+  interfaces: "I-prefixed PascalCase"
+  methods: "PascalCase"
+  async_methods: "PascalCase, suffixed with Async"
+  private_fields: "_camelCase"
+  locals_and_parameters: "camelCase"
+  constants: "PascalCase"
+  booleans: "Is/Has/Can prefix"
+  rules:
+    - "Names must be descriptive and intention-revealing"
+    - "Avoid abbreviations unless universally understood (Id, Api, Url, Db)"
+    - "One public type per file, file name matches type name"
+
+methods:
+  max_lines: 40
+  max_parameters: 5
+  max_nesting_depth: 3
+  rules:
+    - "Single responsibility per method"
+    - "Prefer guard clauses / early returns over deep nesting"
+    - "Use expression-bodied members for simple one-line methods/properties"
+    - "XML doc comments (///) required for public API surface"
+
+error_handling:
+  rules:
+    - "Never catch bare `Exception` without a `when` filter or rethrow"
+    - "Always `throw;` (not `throw e;`) when rethrowing to preserve the stack trace"
+    - "Define a custom exception hierarchy rooted in one AppException base"
+    - "Log at error boundaries (global exception handler / adapter edge), not at every raise site"
+    - "Prefer Result<T>/TryX for expected, recoverable failures over exceptions"
+    - "Register a global IExceptionHandler in ASP.NET Core APIs"
+
+async:
+  rules:
+    - "Suffix all async methods with Async"
+    - "Accept and propagate CancellationToken on every async I/O method"
+    - "Never use async void except top-level UI event handlers"
+    - "Never block on async code with .Result or .GetAwaiter().GetResult()"
+    - "Use ConfigureAwait(false) in library/non-UI code"
+    - "Prefer IAsyncEnumerable<T> over Task<List<T>> for large or streamed results"
+
+dependency_injection:
+  rules:
+    - "Constructor injection only; no service locator pattern"
+    - "Register abstractions (interfaces) in Infrastructure/Api composition root, not Domain"
+    - "Use keyed services (.NET 8+) instead of manual factory dictionaries when selecting an implementation by key"
+    - "Scoped lifetime for anything touching a DbContext; singleton only for stateless/thread-safe services"
+
+testing:
+  framework: "xUnit"
+  assertion_library: "FluentAssertions or Shouldly (project's existing convention wins)"
+  mocking: "NSubstitute or Moq (project's existing convention wins)"
+  rules:
+    - "Test project naming: {ProjectName}.Tests"
+    - "Test method naming: MethodName_Scenario_ExpectedResult"
+    - "Use [Theory] + [InlineData]/[MemberData] for parametrized cases"
+    - "Use WebApplicationFactory<Program> for API integration tests"
+    - "One logical assertion focus per test when practical"
+    - "Use records for test fixtures/builders (immutable, easy value comparison)"
+
+project_structure:
+  layout: "Clean Architecture (Domain / Application / Infrastructure / Api)"
+  config_files:
+    - "Directory.Build.props"
+    - "Directory.Packages.props"
+    - ".editorconfig"
+  rules:
+    - "Domain project has zero external package references"
+    - "Central Package Management for all package versions"
+    - "No circular project references between layers"
+    - "Composition root (Api project's Program.cs) is the only place wiring concrete types to interfaces"
+
+analyzers:
+  enabled:
+    - "Microsoft.CodeAnalysis.NetAnalyzers (built into the SDK, AnalysisLevel=latest-recommended)"
+    - "StyleCop.Analyzers"
+    - "Microsoft.VisualStudio.Threading.Analyzers (async correctness, VSTHRD rules)"
+  treat_as_error:
+    - "CS8600"  # converting null literal or possible null value to non-nullable type
+    - "CS8602"  # dereference of a possibly null reference
+    - "CS8603"  # possible null reference return
+    - "CS8625"  # cannot convert null literal to non-nullable reference type
+    - "CA2007"  # ConfigureAwait(false) missing (library projects only)
