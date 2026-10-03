@@ -1,0 +1,25 @@
+[project]
+name = "fabric-sources"
+version = "0.1.0"
+description = "Seeded Fruit Juice sales event stream and reference tables for lab-streaming-fabric (trimmed from lab-sources)"
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26", "pyarrow>=15"]
+
+[project.scripts]
+generator = "generator.cli:main"
+
+[project.optional-dependencies]
+stream = ["kafka-python-ng>=2.2"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

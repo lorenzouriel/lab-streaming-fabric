@@ -1,0 +1,38 @@
+# Fruit Juice (Sucos de Frutas) foundation dataset - generator configuration.
+# Same config + same seed  =>  byte-identical output.
+
+dataset = "fruit_juice"
+seed = 42
+
+[period]
+start = "2013-01-01"
+end   = "2026-12-31"
+
+[volume]
+# Average number of purchase days per (client, product, factory) per month. Drives row count
+# (about 1.0M Fato_001 rows for 2013-2026 at 4.0). Monthly totals do not depend on it.
+orders_per_month = 4.0
+saturday_weight  = 0.15      # relative likelihood of a purchase on Saturday vs a weekday
+sunday_weight    = 0.05
+share_concentration = 4.0    # Dirichlet alpha: higher = more even split of the month over its days
+
+# After the last fitted year (2015) volume growth decays from the fitted rate toward `terminal_growth`.
+terminal_growth = 0.03
+growth_decay    = 0.6        # g[y+1] = terminal + (g[y] - terminal) * growth_decay
+shock_sigma     = 0.02       # random yearly demand shock (log scale)
+
+[prices]
+inflation       = 0.05       # mean yearly step of the product list price after 2015
+price_sigma     = 0.03       # spread of the yearly price step across products
+cost_inflation  = 0.05       # mean yearly step of the (latent) variable cost per litre
+cost_sigma      = 0.04
+cost_cap_ratio  = 0.75       # unit cost never exceeds this share of the list price
+tax_drift       = 0.02       # mean yearly step of the tax rate after 2015 (common to all products)
+tax_sigma       = 0.01
+tax_cap         = 0.22
+daily_price_noise = 0.01     # extra noise on top of the per-month price of each pair
+freight_inflation = 0.0      # original freight rates are flat over 2013-2015
+
+[fixed_cost]
+# Fixed cost per litre is a yearly rate; after 2015 it is drawn from these observed values.
+rate_choices = [0.2, 0.3, 0.4, 0.5]
